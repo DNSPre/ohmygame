@@ -4,8 +4,9 @@ import { useAuth } from "./auth.js";
 import { settingsHash, type AppNavigationTarget, type SidebarPage } from "./routes.js";
 import { UserAvatar } from "./user-avatar.js";
 import type { DesktopUpdateState } from "../shared/desktop-update.js";
-import brandMark from "./assets/must-studio.svg";
+import brandMark from "./assets/must-emblem.png";
 import { t } from "./i18n.js";
+import "./joint-studio.css";
 
 interface AppSidebarProps {
   active: SidebarPage;
@@ -116,25 +117,32 @@ export function AppSidebar({ active, onNavigate }: AppSidebarProps) {
   }
 
   return (
-    <aside className={`home-sidebar${resizing ? " home-sidebar-resizing" : ""}`} ref={sidebar}>
+    <aside className={`home-sidebar must-sidebar${resizing ? " home-sidebar-resizing" : ""}`} ref={sidebar}>
       {resizing ? <div className="home-sidebar-resize-shield" /> : null}
       <div className="home-sidebar-header-spacer" aria-hidden="true" />
       <div className="home-sidebar-brand">
-        <img src={brandMark} alt="" />
-        <span>{t("jointStudio.name")}</span>
+        <img src={brandMark} alt="" width={38} height={38} />
+        <span className="must-brand-text"><strong>{t("jointStudio.university")}</strong><small>{t("jointStudio.product")}</small></span>
       </div>
       <nav aria-label={t("sidebar.mainNavigation")}>
-        <NavigationItem active={active === "home"} icon="home" label={t("jointStudio.newTask")} onClick={() => onNavigate("home")} />
-        <NavigationItem active={active === "projects"} icon="project" label={t("jointStudio.projectLibrary")} onClick={() => onNavigate("projects")} />
-        <NavigationItem active={active === "library"} icon="library" label={t("sidebar.library")} onClick={() => onNavigate("library")} />
-        <NavigationItem active={active === "plugins"} icon="plugins" label={t("sidebar.plugins")} onClick={() => onNavigate("plugins")} />
-        <NavigationItem active={active === "community"} icon="community" label={t("sidebar.community")} onClick={() => onNavigate("community")} />
-        <div className="home-nav-label home-nav-label-spaced">{t("jointStudio.tools")}</div>
-        <NavigationItem active={active === "web-game"} icon="web-game" label={t("jointStudio.games")} onClick={() => onNavigate("web-game")} />
-        <NavigationItem active={active === "interactive-story"} icon="interactive-story" label={t("projectType.interactive-story")} onClick={() => onNavigate("interactive-story")} />
-        <NavigationItem active={active === "godot"} icon="godot" label={t("projectType.godot-game")} onClick={() => onNavigate("godot")} />
-        <NavigationItem active={active === "asset-canvas"} icon="asset-canvas" label={t("projectType.asset-canvas")} onClick={() => onNavigate("asset-canvas")} />
-        <NavigationItem active={active === "general"} icon="general" label={t("projectType.general")} onClick={() => onNavigate("general")} />
+        <div className="must-menu-group">
+          <NavigationItem active={active === "home"} icon="home" label={t("jointStudio.newTask")} onClick={() => onNavigate("home")} />
+          <NavigationItem active={active === "community"} icon="community" label={t("sidebar.community")} onClick={() => onNavigate("community")} />
+          <NavigationItem active={active === "plugins"} icon="plugins" label={t("jointStudio.skills")} onClick={() => onNavigate("plugins")} />
+        </div>
+        <div className="must-menu-group">
+          <div className="home-nav-label">{t("jointStudio.tools")}</div>
+          <NavigationItem active={active === "web-game"} icon="web-game" label={t("jointStudio.games")} onClick={() => onNavigate("web-game")} />
+          <NavigationItem active={active === "interactive-story"} icon="interactive-story" label={t("projectType.interactive-story")} onClick={() => onNavigate("interactive-story")} />
+          <NavigationItem active={active === "asset-canvas"} icon="asset-canvas" label={t("projectType.asset-canvas")} onClick={() => onNavigate("asset-canvas")} />
+          <NavigationItem active={active === "library"} icon="library" label={t("sidebar.library")} onClick={() => onNavigate("library")} />
+          <NavigationItem active={active === "godot"} icon="godot" label={t("projectType.godot-game")} onClick={() => onNavigate("godot")} />
+          <NavigationItem active={active === "general"} icon="general" label={t("projectType.general")} onClick={() => onNavigate("general")} />
+        </div>
+        <div className="must-menu-group">
+          <div className="home-nav-label">{t("jointStudio.tasks")}</div>
+          <NavigationItem active={active === "projects"} icon="project" label={t("jointStudio.projectLibrary")} onClick={() => onNavigate("projects")} />
+        </div>
       </nav>
       {auth.state.status === "signed-in" ? (
         <div className="home-sidebar-account" ref={account}>

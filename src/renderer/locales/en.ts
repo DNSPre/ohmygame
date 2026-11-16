@@ -634,6 +634,10 @@ const en = {
     importTooLarge: "Choose a project archive up to 10 GB",
   },
   jointStudio: {
+    university: "Macau University of Science and Technology",
+    product: "Game Design Studio",
+    skills: "Agents & Skills",
+    tasks: "Tasks",
     placeholder: "Describe a game idea, an audience, or a mechanic.",
     tools: "Creation tools",
     projectLibrary: "Project library",

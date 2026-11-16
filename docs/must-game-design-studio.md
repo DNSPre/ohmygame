@@ -11,3 +11,6 @@
 
 如需将来单独构建 Mac 客户端，可运行 `bun run package:mac:dir`；本分支使用独立的
 应用名称和包标识。原客户端和已交付的安装镜像无需替换。
+
+校徽取自[澳门科技大学官网的移动端标识](https://www.must.edu.mo/must/image/mobile-logo.png)，
+只裁取左侧圆形校徽，保留原色和比例。

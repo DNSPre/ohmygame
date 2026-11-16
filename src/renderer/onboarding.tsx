@@ -46,7 +46,7 @@ import { useReadyRuntimeGeneration } from "./runtime-connection.js";
 import { WindowDragRegion } from "./window-drag-region.js";
 import { OnboardingMedia } from "./onboarding-media.js";
 import { OnboardingAgents } from "./onboarding-agents.js";
-import studioMark from "./assets/must-studio.svg";
+import studioMark from "./assets/must-emblem.png";
 import { t } from "./i18n.js";
 import "./onboarding.css";
 

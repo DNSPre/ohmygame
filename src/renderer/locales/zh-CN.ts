@@ -619,6 +619,10 @@ const zhCN: typeof en = {
     importTooLarge: "请选择不超过 10 GB 的项目归档",
   },
   jointStudio: {
+    university: "澳門科技大學",
+    product: "遊戲設計工作台",
+    skills: "Agent 与技能",
+    tasks: "任务",
     placeholder: "描述你想做的游戏：玩法、受众，或一个灵感。",
     tools: "创作工具",
     projectLibrary: "作品库",
