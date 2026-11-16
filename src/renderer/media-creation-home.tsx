@@ -5,9 +5,10 @@ import { videoReferenceAspectRatios } from "../shared/video-references.js";
 import { AppSidebar } from "./app-sidebar.js";
 import { createProject, deleteProject, listImageModelCatalog, listVideoModelCatalog, uploadLibraryAsset, waitForRuntime } from "./api.js";
 import { generateCanvasMedia, getCanvasBoard, getCanvasWorkspace, saveCanvasBoard } from "./canvas-api.js";
-import { Film, Image, Plus, SendArrow } from "./icons.js";
+import { Plus, SendArrow } from "./icons.js";
 import { t } from "./i18n.js";
 import type { AppNavigationTarget } from "./routes.js";
+import muyuMark from "./assets/muyu-ai-icon.png";
 import { WindowDragRegion } from "./window-drag-region.js";
 
 type Mode = "image" | "video";
@@ -29,7 +30,6 @@ export function MediaCreationHome({ mode, onNavigate, onOpen }: {
   const [error, setError] = useState<string>();
   const [draft, setDraft] = useState<Draft>();
   const fileInput = useRef<HTMLInputElement>(null);
-  const Icon = mode === "image" ? Image : Film;
   const page = mode === "image" ? "image-generation" : "video-generation";
 
   useEffect(() => {
@@ -113,7 +113,7 @@ export function MediaCreationHome({ mode, onNavigate, onOpen }: {
             <h1>{t(mode === "image" ? "mediaCreation.image" : "mediaCreation.video")}</h1>
             <p className="must-studio-description">{t(mode === "image" ? "mediaCreation.imageHint" : "mediaCreation.videoHint")}</p>
           </div>
-          <div className="must-studio-symbol" aria-hidden="true"><Icon size={44} /></div>
+          <div className="must-studio-symbol must-media-brand"><img src={muyuMark} alt="目鱼 AI" width={80} height={80} /></div>
         </header>
         <form className="must-media-composer" aria-busy={busy} inert={busy} onSubmit={(event) => { event.preventDefault(); void submit(); }}>
           <textarea aria-label={t("mediaCreation.prompt")} maxLength={4000} value={prompt} onChange={(event) => setPrompt(event.target.value)}

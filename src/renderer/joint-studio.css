@@ -105,3 +105,6 @@
 .must-media-reference span { overflow-wrap: anywhere; }
 .must-media-reference button { cursor: pointer; }
 .must-media-notice { font-size: 13px; text-align: start; }
+
+.must-media-brand { background: none; }
+.must-media-brand img { width: 80px; height: 80px; }
