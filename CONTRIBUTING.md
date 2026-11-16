@@ -65,8 +65,8 @@ bun run dev            # web renderer + local daemon
 bun run dev:desktop    # Electron app + local daemon
 ```
 
-For browser development, open <http://127.0.0.1:43120>. Vite forwards API
-requests to the daemon at `127.0.0.1:43110`.
+For browser development, open <http://127.0.0.1:43220>. Vite forwards API
+requests to the daemon at `127.0.0.1:43210`.
 
 No `.env.local`, Supabase setup, cloud repository access, or model credentials
 are needed to start the app and work on its interface or run the public checks.

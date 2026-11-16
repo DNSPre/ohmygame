@@ -21,8 +21,8 @@ obvious from it.
 
 ## Processes
 
-`bun run dev` starts the React renderer on `http://127.0.0.1:43120` and the
-Fastify daemon on `http://127.0.0.1:43110`. Vite proxies the renderer's `/api`
+`bun run dev` starts the React renderer on `http://127.0.0.1:43220` and the
+Fastify daemon on `http://127.0.0.1:43210`. Vite proxies the renderer's `/api`
 requests to the daemon.
 
 `bun run dev:desktop` starts Vite and Electron. Electron starts the compiled

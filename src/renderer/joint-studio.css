@@ -1,0 +1,32 @@
+.must-studio-shell .home-content-fitted {
+  padding-top: clamp(30px, 12vh, 116px);
+  background: radial-gradient(ellipse at 74% 8%, color-mix(in srgb, #8eb5ff 16%, transparent), transparent 52%);
+}
+.must-studio-shell .home-start { width: min(780px, 100%); }
+.must-studio-intro {
+  display: flex; align-items: center; justify-content: space-between; gap: 22px; text-align: start;
+  margin-bottom: 18px; color: var(--text); font-family: "Avenir Next", "PingFang SC", sans-serif;
+}
+.must-studio-eyebrow { font-size: 12px; font-weight: 650; letter-spacing: .11em; margin: 0 0 10px; }
+.home-start .must-studio-intro h1 {
+  font-family: inherit; font-weight: 650; color: inherit; font-size: clamp(27px, 5vw, 44px);
+  line-height: 1.16; margin: 0 0 10px; text-align: start;
+}
+.must-studio-description { font-size: 14px; opacity: .77; margin: 0; }
+.must-studio-symbol {
+  flex: 0 0 104px; height: 96px; display: grid; place-items: center; border-radius: 50%;
+  background: repeating-radial-gradient(ellipse at center, transparent 0 10px, #6e99ee48 11px 12px);
+}
+.must-studio-symbol img { width: 56px; height: 56px; transform: rotate(-9deg); }
+.must-studio-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 12px 0 0; }
+.must-studio-actions button, .must-studio-actions a {
+  display: inline-flex; gap: 6px; align-items: center; border-radius: 999px;
+  border: 1px solid #8292ad55; background: transparent; color: var(--text); padding: 7px 11px; font-size: 12px;
+}
+.must-studio-actions button { cursor: pointer; }
+.must-studio-actions a { margin-inline-start: auto; text-decoration: none; }
+.must-studio-actions :is(button, a):is(:hover, :focus-visible) { background: #7498ee25; border-color: #698de5; }
+@media (max-width: 620px) {
+  .must-studio-symbol { display: none; }
+  .must-studio-actions a { margin-inline-start: 0; }
+}

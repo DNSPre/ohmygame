@@ -62,7 +62,7 @@ export default defineConfig({
     watch: { ignored: ["**/.data/**", "**/dist/**"] },
     proxy: {
       "/api": {
-        target: "http://127.0.0.1:43110",
+        target: "http://127.0.0.1:43210",
         changeOrigin: false,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },

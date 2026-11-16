@@ -1032,3 +1032,6 @@ section.onboarding-media .onboarding-provider-list {
     animation: none;
   }
 }
+
+.onboarding-welcome { --onboarding-intro-duration: 0s; }
+.must-onboarding-mark { display: block; width: 88px; height: 88px; margin: 0 auto 18px; }

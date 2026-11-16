@@ -46,7 +46,7 @@ import { useReadyRuntimeGeneration } from "./runtime-connection.js";
 import { WindowDragRegion } from "./window-drag-region.js";
 import { OnboardingMedia } from "./onboarding-media.js";
 import { OnboardingAgents } from "./onboarding-agents.js";
-import { OnboardingDemo } from "./onboarding-demo.js";
+import studioMark from "./assets/must-studio.svg";
 import { t } from "./i18n.js";
 import "./onboarding.css";
 
@@ -412,7 +412,7 @@ export function Onboarding({
       <div key={`content-${step}`} className="onboarding-content">
         {step === "welcome" ? (
           <>
-            <OnboardingDemo />
+            <img className="must-onboarding-mark" src={studioMark} alt="" />
             <h1
               className="onboarding-welcome-title"
               ref={heading}

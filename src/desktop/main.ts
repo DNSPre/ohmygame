@@ -38,7 +38,7 @@ ignoreBrokenStdio();
 const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = path.resolve(moduleDirectory, "../..");
 loadEnvironmentFiles(repositoryRoot, app.isPackaged ? "production" : "development");
-const developmentRendererUrl = process.env.OHMYGAME_RENDERER_URL ?? "http://127.0.0.1:43120";
+const developmentRendererUrl = process.env.OHMYGAME_RENDERER_URL ?? "http://127.0.0.1:43220";
 const useBuiltRenderer = app.isPackaged || process.argv.includes("--built-renderer");
 let daemon: DaemonSupervisor | undefined;
 const logDirectory = app.getPath("logs");

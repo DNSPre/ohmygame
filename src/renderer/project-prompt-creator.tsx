@@ -20,7 +20,8 @@ import { t } from "./i18n.js";
 
 const EMPTY_CAPABILITIES: ConversationCapabilities = { plugins: [], skills: [] };
 
-export function ProjectPromptCreator({ projectType, projectTypes = PROJECT_TYPES, placeholder, onProjectTypeChange, onOpenProject, onCreate }: {
+export function ProjectPromptCreator({ preset, projectType, projectTypes = PROJECT_TYPES, placeholder, onProjectTypeChange, onOpenProject, onCreate }: {
+  preset?: { text: string };
   projectType: ProjectType;
   projectTypes?: readonly ProjectTypeOption[];
   placeholder: string;
@@ -52,6 +53,15 @@ export function ProjectPromptCreator({ projectType, projectTypes = PROJECT_TYPES
   const [history, setHistory] = useState(() => createPromptHistory(storedHistory.map((entry) => entry.prompt)));
   const mentionHistory = new Map(storedHistory.map((entry) => [entry.prompt, entry.mentions]));
   const promptRef = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => {
+    if (!preset) return;
+    setPrompt(preset.text);
+    setSelectedSkill(undefined);
+    setSelectedPlugin(undefined);
+    setPluginMentions([]);
+    setMentionCursor(preset.text.length);
+    promptRef.current?.focus();
+  }, [preset]);
   const modelCatalog = useAgentModels({ agentRuntimes: true });
   const selectedModel = preferredAgentModel(modelCatalog.models, model, modelCatalog.defaultModel);
   const contextMenu = useComposerContextMenu({

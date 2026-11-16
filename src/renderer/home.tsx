@@ -16,6 +16,7 @@ import { WindowDragRegion } from "./window-drag-region.js";
 import { useProjectShelfLayout } from "./use-project-shelf-layout.js";
 import { useProjectActivity } from "./use-project-activity.js";
 import "./studios.css";
+import { JointStudioHero, JointStudioActions } from "./joint-studio.js";
 import { t } from "./i18n.js";
 
 interface HomeProps {
@@ -33,6 +34,7 @@ export function Home({ onNavigate, onCreate, onOpen, inert = false }: HomeProps)
   const [loadError, setLoadError] = useState<string>();
   const [projectActionError, setProjectActionError] = useState<string>();
   const [projectType, setProjectType] = useState<ProjectType>("web-game");
+  const [preset, setPreset] = useState<{ text: string }>();
   const [createOpen, setCreateOpen] = useState(false);
   const [renameTarget, setRenameTarget] = useState<ProjectState>();
   const renameTrigger = useRef<HTMLElement | null>(null);
@@ -82,21 +84,26 @@ export function Home({ onNavigate, onCreate, onOpen, inert = false }: HomeProps)
   const visibleExamples = examples.slice(0, columns);
 
   return (
-    <main className="home-shell" inert={inert}>
+    <main className="home-shell must-studio-shell" inert={inert}>
       <AppSidebar active="home" onNavigate={onNavigate} />
 
       <section className="home-content home-content-fitted">
         <WindowDragRegion />
         <div className="home-start">
-          <h1>{t("home.title")}</h1>
+          <JointStudioHero />
           <ProjectPromptCreator
+            preset={preset}
             projectType={projectType}
             projectTypes={GAME_PROJECT_TYPES}
-            placeholder={t("home.placeholder")}
+            placeholder={t("jointStudio.placeholder")}
             onProjectTypeChange={setProjectType}
             onOpenProject={onOpen}
             onCreate={onCreate}
           />
+          <JointStudioActions onGames={() => onNavigate("web-game")} onPreset={(text) => {
+            setProjectType("web-game");
+            setPreset({ text });
+          }} />
           <button className="home-start-blank" type="button" onClick={() => setCreateOpen(true)}>
             <Plus size={14} />{t("home.startBlank")}
           </button>

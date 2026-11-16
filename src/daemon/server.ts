@@ -82,7 +82,7 @@ try {
     playtestDriver,
     ...externalAgentOptions(),
   });
-  await app.listen({ host, port: Number(process.env.DAEMON_PORT ?? 43110) });
+  await app.listen({ host, port: Number(process.env.DAEMON_PORT ?? 43210) });
 } catch (error) {
   if (app) app.log.error(error); else console.error(error);
   await app?.close();

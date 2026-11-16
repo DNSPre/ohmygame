@@ -4,7 +4,7 @@ import { useAuth } from "./auth.js";
 import { settingsHash, type AppNavigationTarget, type SidebarPage } from "./routes.js";
 import { UserAvatar } from "./user-avatar.js";
 import type { DesktopUpdateState } from "../shared/desktop-update.js";
-import brandMark from "../shared/assets/ohmygame-mark-v2.svg";
+import brandMark from "./assets/must-studio.svg";
 import { t } from "./i18n.js";
 
 interface AppSidebarProps {
@@ -120,17 +120,17 @@ export function AppSidebar({ active, onNavigate }: AppSidebarProps) {
       {resizing ? <div className="home-sidebar-resize-shield" /> : null}
       <div className="home-sidebar-header-spacer" aria-hidden="true" />
       <div className="home-sidebar-brand">
-        <img src={brandMark} alt="OhMyGame" />
-        <span>OhMyGame</span>
+        <img src={brandMark} alt="" />
+        <span>{t("jointStudio.name")}</span>
       </div>
       <nav aria-label={t("sidebar.mainNavigation")}>
-        <NavigationItem active={active === "home"} icon="home" label={t("sidebar.home")} onClick={() => onNavigate("home")} />
-        <NavigationItem active={active === "projects"} icon="project" label={t("sidebar.projects")} onClick={() => onNavigate("projects")} />
+        <NavigationItem active={active === "home"} icon="home" label={t("jointStudio.newTask")} onClick={() => onNavigate("home")} />
+        <NavigationItem active={active === "projects"} icon="project" label={t("jointStudio.projectLibrary")} onClick={() => onNavigate("projects")} />
         <NavigationItem active={active === "library"} icon="library" label={t("sidebar.library")} onClick={() => onNavigate("library")} />
         <NavigationItem active={active === "plugins"} icon="plugins" label={t("sidebar.plugins")} onClick={() => onNavigate("plugins")} />
         <NavigationItem active={active === "community"} icon="community" label={t("sidebar.community")} onClick={() => onNavigate("community")} />
-        <div className="home-nav-label home-nav-label-spaced">{t("sidebar.studios")}</div>
-        <NavigationItem active={active === "web-game"} icon="web-game" label={t("projectType.web-game")} onClick={() => onNavigate("web-game")} />
+        <div className="home-nav-label home-nav-label-spaced">{t("jointStudio.tools")}</div>
+        <NavigationItem active={active === "web-game"} icon="web-game" label={t("jointStudio.games")} onClick={() => onNavigate("web-game")} />
         <NavigationItem active={active === "interactive-story"} icon="interactive-story" label={t("projectType.interactive-story")} onClick={() => onNavigate("interactive-story")} />
         <NavigationItem active={active === "godot"} icon="godot" label={t("projectType.godot-game")} onClick={() => onNavigate("godot")} />
         <NavigationItem active={active === "asset-canvas"} icon="asset-canvas" label={t("projectType.asset-canvas")} onClick={() => onNavigate("asset-canvas")} />
