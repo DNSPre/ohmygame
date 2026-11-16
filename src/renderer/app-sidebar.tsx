@@ -1,4 +1,4 @@
-import { ArrowDownToLine, Gamepad2, Globe2, InfoCircle, MoreHorizontal, RefreshCw, UserRound, Wrench } from "./icons.js";
+import { ArrowDownToLine, Film, Gamepad2, Globe2, Image, InfoCircle, MoreHorizontal, RefreshCw, UserRound, Wrench } from "./icons.js";
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
 import { useAuth } from "./auth.js";
 import { settingsHash, type AppNavigationTarget, type SidebarPage } from "./routes.js";
@@ -132,6 +132,8 @@ export function AppSidebar({ active, onNavigate }: AppSidebarProps) {
         </div>
         <div className="must-menu-group">
           <div className="home-nav-label">{t("jointStudio.tools")}</div>
+          <NavigationItem active={active === "image-generation"} icon="image" label={t("mediaCreation.image")} onClick={() => onNavigate("image-generation")} />
+          <NavigationItem active={active === "video-generation"} icon="video" label={t("mediaCreation.video")} onClick={() => onNavigate("video-generation")} />
           <NavigationItem active={active === "web-game"} icon="web-game" label={t("jointStudio.games")} onClick={() => onNavigate("web-game")} />
           <NavigationItem active={active === "interactive-story"} icon="interactive-story" label={t("projectType.interactive-story")} onClick={() => onNavigate("interactive-story")} />
           <NavigationItem active={active === "asset-canvas"} icon="asset-canvas" label={t("projectType.asset-canvas")} onClick={() => onNavigate("asset-canvas")} />
@@ -235,11 +237,11 @@ function NavigationItem({
   onClick,
 }: {
   active: boolean;
-  icon: "home" | "project" | "library" | "general" | "web-game" | "interactive-story" | "godot" | "asset-canvas" | "community" | "plugins";
+  icon: "home" | "project" | "library" | "general" | "web-game" | "interactive-story" | "godot" | "asset-canvas" | "community" | "plugins" | "image" | "video";
   label: string;
   onClick: () => void;
 }) {
-  const content = <>{icon === "web-game" || icon === "general" ? <span className="home-nav-symbol" aria-hidden="true">{icon === "general" ? <Gamepad2 size={16} /> : <Globe2 size={16} />}</span> : <span className={`home-nav-icon home-nav-icon-${icon}`} aria-hidden="true" />}<span>{label}</span></>;
+  const content = <>{icon === "web-game" || icon === "general" || icon === "image" || icon === "video" ? <span className="home-nav-symbol" aria-hidden="true">{icon === "general" ? <Gamepad2 size={16} /> : icon === "image" ? <Image size={16} /> : icon === "video" ? <Film size={16} /> : <Globe2 size={16} />}</span> : <span className={`home-nav-icon home-nav-icon-${icon}`} aria-hidden="true" />}<span>{label}</span></>;
   return (
     <button
       className={`home-nav-item${active ? " home-nav-item-active" : ""}`}

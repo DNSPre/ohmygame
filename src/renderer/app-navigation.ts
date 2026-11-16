@@ -75,6 +75,10 @@ function returnPageLabel(hash: string): string {
       return t("projectType.interactive-story");
     case "godot":
       return t("projectType.godot-game");
+    case "image-generation":
+      return t("mediaCreation.image");
+    case "video-generation":
+      return t("mediaCreation.video");
     case "asset-canvas":
       return t("projectType.asset-canvas");
     case "library":

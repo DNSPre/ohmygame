@@ -57,3 +57,51 @@
   .must-sidebar nav { gap: 0; }
   .must-menu-group { display: contents; }
 }
+
+.must-media-composer {
+  display: grid;
+  padding: 14px 15px 10px;
+  border: 1px solid color-mix(in srgb, var(--text) 14%, transparent);
+  border-radius: 21px;
+  background: var(--surface, Canvas);
+  box-shadow: 0 6px 22px #1d2d4811;
+  color: var(--text);
+  text-align: start;
+}
+.must-media-composer textarea {
+  background: transparent;
+  color: inherit;
+  border: 0;
+  padding: 4px 3px;
+  width: 100%;
+  min-height: 94px;
+  resize: vertical;
+  font: inherit;
+}
+.must-media-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
+.must-media-toolbar :is(button, select), .must-media-reference button {
+  color: inherit; background: transparent; border: 0; border-radius: 8px; font: inherit;
+}
+.must-media-toolbar :is(button, select):enabled, .must-media-switch { cursor: pointer; }
+.must-media-toolbar select { max-width: min(230px, 100%); padding: 5px; font-size: 13px; }
+.must-media-toolbar .must-media-add { display: grid; place-items: center; padding: 6px; }
+.must-media-toolbar .must-media-send {
+  width: 36px; height: 36px; display: grid; place-items: center; margin-inline-start: auto;
+  background: var(--text); color: var(--surface, Canvas); border-radius: 50%;
+}
+.must-media-toolbar button:disabled { opacity: .35; }
+.must-media-switch { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+.must-media-switch input {
+  appearance: none; position: relative; width: 34px; height: 20px; margin: 0;
+  background: #7f8998; border-radius: 20px; cursor: pointer;
+}
+.must-media-switch input:checked { background: #386afb; }
+.must-media-switch input::before {
+  content: ""; position: absolute; inset: 2px auto 2px 2px; width: 16px;
+  background: #fff; border-radius: 50%;
+}
+.must-media-switch input:checked::before { transform: translateX(14px); }
+.must-media-reference { display: flex; gap: 6px; align-items: center; padding: 0 4px 6px; }
+.must-media-reference span { overflow-wrap: anywhere; }
+.must-media-reference button { cursor: pointer; }
+.must-media-notice { font-size: 13px; text-align: start; }

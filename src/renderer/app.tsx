@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from "react";
+import { MediaCreationHome } from "./media-creation-home.js";
 import { Home } from "./home.js";
 // Only lazy routes use this; loading it eagerly keeps it ahead of styles.css as before code splitting.
 import "./plugin-builder.css";
@@ -73,6 +74,9 @@ export function App() {
   </SidebarPageLayout></>;
   if (route.page === "home") {
     return <><Home inert={welcoming} onNavigate={navigateToSidebarPage} onCreate={openCreatedProject} onOpen={openProject} />{welcoming ? <OnboardingArrival onComplete={() => setWelcoming(false)} /> : null}</>;
+  }
+  if (route.page === "image-generation" || route.page === "video-generation") {
+    return <MediaCreationHome key={route.page} mode={route.page === "image-generation" ? "image" : "video"} onNavigate={navigateToSidebarPage} onOpen={openAssetCanvasProject} />;
   }
   if (route.page === "community") {
     return <Suspense fallback={sidebarFallback("community")}><GamesPage onNavigate={navigateToSidebarPage} onOhMyGame={ohMyGame} /></Suspense>;
