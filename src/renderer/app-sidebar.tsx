@@ -10,6 +10,7 @@ import "./joint-studio.css";
 
 interface AppSidebarProps {
   active: SidebarPage;
+  pagesPreview?: boolean;
   onNavigate: (page: AppNavigationTarget) => void;
 }
 
@@ -18,7 +19,7 @@ const MIN_SIDEBAR_WIDTH = 208;
 const MAX_SIDEBAR_WIDTH = 272;
 const SIDEBAR_WIDTH_STORAGE_KEY = "ohmygame-sidebar-width";
 
-export function AppSidebar({ active, onNavigate }: AppSidebarProps) {
+export function AppSidebar({ active, onNavigate, pagesPreview = false }: AppSidebarProps) {
   const auth = useAuth();
   const [sidebarWidth, setSidebarWidth] = useState(readSidebarWidth);
   const [resizing, setResizing] = useState(false);
@@ -146,7 +147,7 @@ export function AppSidebar({ active, onNavigate }: AppSidebarProps) {
           <NavigationItem active={active === "projects"} icon="project" label={t("jointStudio.projectLibrary")} onClick={() => onNavigate("projects")} />
         </div>
       </nav>
-      {auth.state.status === "signed-in" ? (
+      {pagesPreview ? <div className="home-sidebar-account"><span className="home-sidebar-account-name">{t("pagesPreview.badge")}</span></div> : auth.state.status === "signed-in" ? (
         <div className="home-sidebar-account" ref={account}>
           <button className="home-sidebar-account-main" type="button" aria-label={t("sidebar.openAccountMenu")} aria-expanded={accountMenuOpen} onClick={() => {
             setAccountMenuOpen((open) => !open);

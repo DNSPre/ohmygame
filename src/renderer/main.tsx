@@ -1,5 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { init as initSentry } from "@sentry/electron/renderer";
+import { PagesPreview } from "./pages-preview.js";
 import { App } from "./app.js";
 import { AuthProvider } from "./auth.js";
 import { PlaytestPage } from "./playtest.js";
@@ -53,11 +54,11 @@ const content = (
   </>
 );
 createRoot(root).render(
-  route.page === "playtest" || route.page === "thumbnail" ? (
+  import.meta.env.VITE_MUST_PAGES === "1" ? <PagesPreview /> : route.page === "playtest" || route.page === "thumbnail" ? (
     content
   ) : (
     <DesktopCloseGuard>{content}</DesktopCloseGuard>
   ),
 );
 // The hidden thumbnail window is not a visit. Analytics waits until the first frame is up.
-if (route.page !== "thumbnail") requestIdleCallback(initializeAnalytics, { timeout: 2_000 });
+if (import.meta.env.VITE_MUST_PAGES !== "1" && route.page !== "thumbnail") requestIdleCallback(initializeAnalytics, { timeout: 2_000 });

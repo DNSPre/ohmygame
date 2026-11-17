@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { AssetCanvasReference, ImageModel, MediaModelCatalog, VideoModel } from "../shared/contracts.js";
 import { createAssetCanvasStarterDocument, preferredImageOption } from "../shared/asset-canvas.js";
 import { videoReferenceAspectRatios } from "../shared/video-references.js";
+import { PagesExport, PagesNotice, readPagesDraft, savePagesDraft } from "./pages-prompt.js";
 import { AppSidebar } from "./app-sidebar.js";
 import { createProject, deleteProject, listImageModelCatalog, listVideoModelCatalog, uploadLibraryAsset, waitForRuntime } from "./api.js";
 import { generateCanvasMedia, getCanvasBoard, getCanvasWorkspace, saveCanvasBoard } from "./canvas-api.js";
@@ -15,15 +16,17 @@ type Mode = "image" | "video";
 type Model = ImageModel | VideoModel;
 type Draft = { projectId: string; nodeId: string };
 
-export function MediaCreationHome({ mode, onNavigate, onOpen }: {
+export function MediaCreationHome({ mode, onNavigate, onOpen, pagesPreview = false }: {
   mode: Mode;
+  pagesPreview?: boolean;
   onNavigate: (page: AppNavigationTarget) => void;
   onOpen: (projectId: string, nodeId: string) => void;
 }) {
   const [catalog, setCatalog] = useState<MediaModelCatalog<Model>>();
-  const [prompt, setPrompt] = useState("");
+  const [prompt, setPrompt] = useState(() => pagesPreview ? readPagesDraft(mode) : "");
+  const [draftStatus, setDraftStatus] = useState("");
   const [modelKey, setModelKey] = useState("");
-  const [autoRun, setAutoRun] = useState(true);
+  const [autoRun, setAutoRun] = useState(!pagesPreview);
   const [reference, setReference] = useState<File>();
   const [busy, setBusy] = useState(false);
   const saving = useRef(false);
@@ -33,12 +36,13 @@ export function MediaCreationHome({ mode, onNavigate, onOpen }: {
   const page = mode === "image" ? "image-generation" : "video-generation";
 
   useEffect(() => {
+    if (pagesPreview) return;
     let live = true;
     void waitForRuntime().then<MediaModelCatalog<Model>>(() => mode === "image" ? listImageModelCatalog() : listVideoModelCatalog())
       .then((models) => { if (live) setCatalog(models); })
       .catch((cause: unknown) => { if (live) setError(message(cause)); });
     return () => { live = false; };
-  }, [mode]);
+  }, [mode, pagesPreview]);
 
   const models = catalog?.models ?? [];
   const defaultModel = catalog?.defaultModel;
@@ -50,6 +54,7 @@ export function MediaCreationHome({ mode, onNavigate, onOpen }: {
 
   async function submit(): Promise<void> {
     if (!canSubmit || saving.current) return;
+    if (pagesPreview) { setDraftStatus(savePagesDraft(mode, prompt)); return; }
     saving.current = true;
     setBusy(true);
     setError(undefined);
@@ -103,7 +108,7 @@ export function MediaCreationHome({ mode, onNavigate, onOpen }: {
   }
 
   return <main className="home-shell must-studio-shell">
-    <AppSidebar active={page} onNavigate={(target) => { if (!saving.current) onNavigate(target); }} />
+    <AppSidebar active={page} pagesPreview={pagesPreview} onNavigate={(target) => { if (!saving.current) onNavigate(target); }} />
     <section className="home-content home-content-fitted">
       <WindowDragRegion />
       <div className="home-start">
@@ -140,14 +145,16 @@ export function MediaCreationHome({ mode, onNavigate, onOpen }: {
               <option value="image-generation">{t("mediaCreation.image")}</option>
               <option value="video-generation">{t("mediaCreation.video")}</option>
             </select>
-            <label className="must-media-switch">{t("mediaCreation.autoRun")} <input type="checkbox" role="switch" checked={autoRun} onChange={(event) => setAutoRun(event.target.checked)} /></label>
-            <select aria-label={t("mediaCreation.autoModel")} value={modelKey} onChange={(event) => setModelKey(event.target.value)}>
+            <label className="must-media-switch">{t("mediaCreation.autoRun")} <input type="checkbox" role="switch" checked={autoRun} disabled={pagesPreview} onChange={(event) => setAutoRun(event.target.checked)} /></label>
+            <select aria-label={t("mediaCreation.autoModel")} value={modelKey} disabled={pagesPreview} onChange={(event) => setModelKey(event.target.value)}>
               <option value="">{t("mediaCreation.autoModel")}</option>
               {models.map((item) => <option key={key(item)} value={key(item)}>{item.providerName} · {item.name}</option>)}
             </select>
             <button className="must-media-send" type="submit" disabled={!canSubmit} aria-label={t(autoRun ? "mediaCreation.generate" : "mediaCreation.draft")} title={t(autoRun ? "mediaCreation.generate" : "mediaCreation.draft")}><SendArrow size={17} /></button>
           </div>
         </form>
+        {draftStatus ? <p role="status">{draftStatus}</p> : null}
+        {pagesPreview ? <><PagesExport mode={mode} value={prompt} /><PagesNotice /></> : null}
         {busy ? <p role="status">{t("mediaCreation.saving")}</p> : null}
         {catalog && !models.length ? <p className="must-media-notice">{t("mediaCreation.noModel")} <button type="button" disabled={busy} onClick={() => onNavigate("settings")}>{t("mediaCreation.manage")}</button></p> : null}
         {reference && !acceptsReference ? <p role="alert">{t("mediaCreation.noReference")}</p> : null}

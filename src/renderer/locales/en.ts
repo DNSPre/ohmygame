@@ -633,6 +633,17 @@ const en = {
     importChooseZip: "Choose one ZIP project archive",
     importTooLarge: "Choose a project archive up to 10 GB",
   },
+  pagesPreview: {
+    export: "Export prompt",
+    badge: "Online preview",
+    notice: "Explore the interface and save drafts. Generation, project data, and live play require the full workspace backend.",
+    projects: "Cloud projects are not connected. This site does not read your local projects.",
+    draft: "Save draft",
+    saved: "Draft saved in this browser.",
+    failed: "This browser could not save the draft.",
+    backend: "This feature needs the studio backend",
+    fullSource: "View the full workspace",
+  },
   mediaCreation: {
     image: "Image generation",
     video: "Video generation",

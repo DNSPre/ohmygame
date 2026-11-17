@@ -618,6 +618,17 @@ const zhCN: typeof en = {
     importChooseZip: "请选择一个 ZIP 项目归档",
     importTooLarge: "请选择不超过 10 GB 的项目归档",
   },
+  pagesPreview: {
+    export: "匯出提示詞",
+    badge: "線上體驗版",
+    notice: "此站可體驗介面及儲存提示詞。生成、專案資料和即時試玩需連接完整工作台後端。",
+    projects: "雲端專案尚未連接。此站不會讀取你本機的專案。",
+    draft: "儲存草稿",
+    saved: "草稿已保存在目前瀏覽器。",
+    failed: "無法在此瀏覽器保存草稿。",
+    backend: "此功能需連接工作台後端",
+    fullSource: "查看完整工作台",
+  },
   mediaCreation: {
     image: "图片生成",
     video: "视频生成",

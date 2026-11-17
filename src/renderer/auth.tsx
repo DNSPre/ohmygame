@@ -38,6 +38,14 @@ interface AuthClient {
   auth: Pick<ReturnType<typeof createClient>["auth"], "exchangeCodeForSession" | "getSession" | "onAuthStateChange" | "signInWithOAuth" | "signOut">;
 }
 
+const pagesAuth: AuthContextValue = {
+  state: { status: "signed-out" }, openSignIn: () => {},
+  requestAccessToken: async () => undefined, signOut: async () => {},
+};
+export function PagesAuthProvider({ children }: { children: ReactNode }) {
+  return <AuthContext.Provider value={pagesAuth}>{children}</AuthContext.Provider>;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const serviceGeneration = useReadyRuntimeGeneration();
   const [state, setState] = useState<AuthState>(() => {

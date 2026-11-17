@@ -108,3 +108,14 @@
 
 .must-media-brand { background: none; }
 .must-media-brand img { width: 80px; height: 80px; }
+
+.must-pages-notice {
+  margin: 16px 0 0;
+  padding: 9px 12px;
+  border-radius: 9px;
+  background: color-mix(in srgb, #7498ee 14%, transparent);
+  text-align: start;
+  font-size: 13px;
+}
+.must-pages-notice a { text-decoration: underline; }
+.must-pages-toast { position: fixed; bottom: 16px; right: 16px; }

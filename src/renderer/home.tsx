@@ -17,19 +17,21 @@ import { useProjectShelfLayout } from "./use-project-shelf-layout.js";
 import { useProjectActivity } from "./use-project-activity.js";
 import "./studios.css";
 import { JointStudioHero, JointStudioActions } from "./joint-studio.js";
+import { PagesPrompt, PagesNotice } from "./pages-prompt.js";
 import { t } from "./i18n.js";
 
 interface HomeProps {
   inert?: boolean;
+  pagesPreview?: boolean;
   onNavigate: (page: AppNavigationTarget) => void;
   onCreate: (project: ProjectState, conversationId: string, prompt: string, mentions: PluginMention[], images: PromptImage[], mode: PromptMode, attachments?: PromptAttachment[]) => void;
   onOpen: (projectId: string, view?: "design") => void;
 }
 
-export function Home({ onNavigate, onCreate, onOpen, inert = false }: HomeProps) {
+export function Home({ onNavigate, onCreate, onOpen, inert = false, pagesPreview = false }: HomeProps) {
   const serviceGeneration = useReadyRuntimeGeneration();
   const [projects, setProjects] = useState<ProjectState[]>([]);
-  const [phase, setPhase] = useState<"loading" | "ready" | "error">("loading");
+  const [phase, setPhase] = useState<"loading" | "ready" | "error">(pagesPreview ? "ready" : "loading");
   const activity = useProjectActivity(phase === "ready" && projects.length > 0, setProjects);
   const [loadError, setLoadError] = useState<string>();
   const [projectActionError, setProjectActionError] = useState<string>();
@@ -38,7 +40,7 @@ export function Home({ onNavigate, onCreate, onOpen, inert = false }: HomeProps)
   const [createOpen, setCreateOpen] = useState(false);
   const [renameTarget, setRenameTarget] = useState<ProjectState>();
   const renameTrigger = useRef<HTMLElement | null>(null);
-  const { examples, covers: exampleCovers } = useExamples();
+  const { examples, covers: exampleCovers } = useExamples(!pagesPreview);
   const { sectionRef, columns, recentProjectLimit } = useProjectShelfLayout();
 
   async function loadProjects() {
@@ -54,7 +56,7 @@ export function Home({ onNavigate, onCreate, onOpen, inert = false }: HomeProps)
     }
   }
 
-  useEffect(() => { void loadProjects(); }, [serviceGeneration]);
+  useEffect(() => { if (!pagesPreview) void loadProjects(); }, [serviceGeneration, pagesPreview]);
   async function rename(project: ProjectState, input: string) {
     const name = input.trim();
     if (!name || name === project.name) return;
@@ -85,13 +87,13 @@ export function Home({ onNavigate, onCreate, onOpen, inert = false }: HomeProps)
 
   return (
     <main className="home-shell must-studio-shell" inert={inert}>
-      <AppSidebar active="home" onNavigate={onNavigate} />
+      <AppSidebar active="home" onNavigate={onNavigate} pagesPreview={pagesPreview} />
 
       <section className="home-content home-content-fitted">
         <WindowDragRegion />
         <div className="home-start">
           <JointStudioHero />
-          <ProjectPromptCreator
+          {pagesPreview ? <PagesPrompt preset={preset} projectType={projectType} onProjectTypeChange={setProjectType} /> : <ProjectPromptCreator
             preset={preset}
             projectType={projectType}
             projectTypes={GAME_PROJECT_TYPES}
@@ -99,14 +101,14 @@ export function Home({ onNavigate, onCreate, onOpen, inert = false }: HomeProps)
             onProjectTypeChange={setProjectType}
             onOpenProject={onOpen}
             onCreate={onCreate}
-          />
+          />}
           <JointStudioActions onGames={() => onNavigate("web-game")} onPreset={(text) => {
             setProjectType("web-game");
             setPreset({ text });
           }} />
-          <button className="home-start-blank" type="button" onClick={() => setCreateOpen(true)}>
+          {pagesPreview ? <PagesNotice /> : <button className="home-start-blank" type="button" onClick={() => setCreateOpen(true)}>
             <Plus size={14} />{t("home.startBlank")}
-          </button>
+          </button>}
         </div>
 
         <section ref={sectionRef} className="home-recent studio-projects" aria-labelledby="projects-heading">
@@ -125,7 +127,7 @@ export function Home({ onNavigate, onCreate, onOpen, inert = false }: HomeProps)
           {phase === "error" ? <p className="home-project-state" role="alert">{loadError}</p> : null}
           {phase === "ready" && projects.length === 0 ? (
             <p className="home-project-state">
-              {t("projects.none")}
+              {t(pagesPreview ? "pagesPreview.projects" : "projects.none")}
             </p>
           ) : null}
           {phase === "ready" && projects.length > 0 ? (

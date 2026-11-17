@@ -7,12 +7,13 @@ import { projectTypeLabel } from "./project-types.js";
 import { t } from "./i18n.js";
 
 /** Packaged examples and object URLs for their covers, revoked on unmount. */
-export function useExamples(): { examples: ExampleSummary[]; covers: Record<string, string> } {
+export function useExamples(enabled = true): { examples: ExampleSummary[]; covers: Record<string, string> } {
   const serviceGeneration = useReadyRuntimeGeneration();
   const [examples, setExamples] = useState<ExampleSummary[]>([]);
   const [covers, setCovers] = useState<Record<string, string>>({});
 
   useEffect(() => {
+    if (!enabled) return;
     let disposed = false;
     const coverUrls: string[] = [];
     setCovers({});
@@ -31,7 +32,7 @@ export function useExamples(): { examples: ExampleSummary[]; covers: Record<stri
       disposed = true;
       for (const url of coverUrls) URL.revokeObjectURL(url);
     };
-  }, [serviceGeneration]);
+  }, [serviceGeneration, enabled]);
 
   return { examples, covers };
 }

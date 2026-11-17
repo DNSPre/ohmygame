@@ -1,3 +1,4 @@
+import { PagesNotice, PagesPrompt } from "./pages-prompt.js";
 import { useReadyRuntimeGeneration } from "./runtime-connection.js";
 import { useEffect, useRef, useState } from "react";
 import type {
@@ -35,6 +36,7 @@ import "./studios.css";
 import { t } from "./i18n.js";
 
 interface GameStudioHomeProps {
+  pagesPreview?: boolean;
   projectType: GameStudioType;
   onNavigate: (page: AppNavigationTarget) => void;
   onCreate: (
@@ -54,18 +56,19 @@ export function GameStudioHome({
   onNavigate,
   onCreate,
   onOpenProject,
+  pagesPreview = false,
 }: GameStudioHomeProps) {
   const serviceGeneration = useReadyRuntimeGeneration();
   const studio = GAME_STUDIOS[projectType];
   const [projects, setProjects] = useState<ProjectState[]>([]);
-  const [phase, setPhase] = useState<"loading" | "ready" | "error">("loading");
+  const [phase, setPhase] = useState<"loading" | "ready" | "error">(pagesPreview ? "ready" : "loading");
   const activity = useProjectActivity(phase === "ready" && projects.length > 0, setProjects);
   const [error, setError] = useState<string>();
   const [actionError, setActionError] = useState<string>();
   const [createOpen, setCreateOpen] = useState(false);
   const [renameTarget, setRenameTarget] = useState<ProjectState>();
   const renameTrigger = useRef<HTMLElement | null>(null);
-  const { examples, covers } = useExamples();
+  const { examples, covers } = useExamples(!pagesPreview);
   const { sectionRef, columns, recentProjectLimit } = useProjectShelfLayout();
   const visibleProjects = projects.slice(0, recentProjectLimit);
   const studioExamples = examples
@@ -86,8 +89,8 @@ export function GameStudioHome({
   }
 
   useEffect(() => {
-    void load();
-  }, [projectType, serviceGeneration]);
+    if (!pagesPreview) void load();
+  }, [projectType, serviceGeneration, pagesPreview]);
 
   async function runAction(action: () => Promise<unknown>): Promise<void> {
     setActionError(undefined);
@@ -106,27 +109,27 @@ export function GameStudioHome({
 
   return (
     <main className="home-shell">
-      <AppSidebar active={studio.page} onNavigate={onNavigate} />
+      <AppSidebar active={studio.page} onNavigate={onNavigate} pagesPreview={pagesPreview} />
       <section
         className={`home-content home-content-fitted game-studio-home studio-${studio.page}`}
       >
         <WindowDragRegion />
         <div className="home-start">
           <h1>{studio.title}</h1>
-          <ProjectPromptCreator
+          {pagesPreview ? <PagesPrompt projectType={projectType} placeholder={studio.placeholder} /> : <ProjectPromptCreator
             projectType={projectType}
             placeholder={studio.placeholder}
             onOpenProject={onOpenProject}
             onCreate={onCreate}
-          />
-          <button
+          />}
+          {pagesPreview ? <PagesNotice /> : <button
             className="home-start-blank"
             type="button"
             onClick={() => setCreateOpen(true)}
           >
             <Plus size={14} />
             {studio.newLabel}
-          </button>
+          </button>}
         </div>
 
         <section
@@ -164,7 +167,7 @@ export function GameStudioHome({
             </p>
           ) : null}
           {phase === "ready" && !projects.length ? (
-            <p className="home-project-state">{t("projects.none")}</p>
+            <p className="home-project-state">{t(pagesPreview ? "pagesPreview.projects" : "projects.none")}</p>
           ) : null}
           {phase === "ready" && projects.length > 0 ? (
             <div className="studio-project-grid">
