@@ -132,6 +132,7 @@ export function AppSidebar({ active, onNavigate }: AppSidebarProps) {
         </div>
         <div className="must-menu-group">
           <div className="home-nav-label">{t("jointStudio.tools")}</div>
+          <NavigationItem active={active === "light-game"} icon="web-game" label={t("lightGame.nav")} onClick={() => onNavigate("light-game")} />
           <NavigationItem active={active === "image-generation"} icon="image" label={t("mediaCreation.image")} onClick={() => onNavigate("image-generation")} />
           <NavigationItem active={active === "video-generation"} icon="video" label={t("mediaCreation.video")} onClick={() => onNavigate("video-generation")} />
           <NavigationItem active={active === "web-game"} icon="web-game" label={t("jointStudio.games")} onClick={() => onNavigate("web-game")} />

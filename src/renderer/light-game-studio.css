@@ -1,0 +1,24 @@
+.must-light-content { padding: clamp(28px, 6vh, 66px) clamp(16px, 4vw, 55px) 48px; }
+.must-light-header { margin: 0 auto 22px; max-width: 1200px; }
+.must-light-header h1 { margin: 0; font-size: clamp(26px, 4vw, 40px); }
+.must-light-header > p:last-child { opacity: .8; }
+.must-light-grid { display: grid; grid-template-columns: minmax(300px, .95fr) minmax(330px, 1.05fr); gap: 16px; max-width: 1200px; margin: auto; align-items: start; }
+.must-light-panel { display: grid; gap: 10px; padding: 15px; border: 1px solid color-mix(in srgb, var(--text) 16%, transparent); border-radius: 15px; margin: 0 0 14px; min-width: 0; }
+.must-light-panel legend, .must-light-panel h2 { font-size: 16px; font-weight: 650; margin: 0; }
+.must-light-panel label { display: grid; gap: 5px; }
+.must-light-panel .must-light-revision { display: flex; align-items: center; }
+.must-light-panel :is(input:not([type=checkbox]), textarea, select) { box-sizing: border-box; width: 100%; color: var(--text); background: var(--surface, Canvas); border: 1px solid color-mix(in srgb, var(--text) 22%, transparent); border-radius: 8px; padding: 7px; font: inherit; }
+.must-light-panel textarea { resize: vertical; }
+.must-light-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.must-light-panel button, .must-light-entry { color: var(--text); background: transparent; border: 1px solid #7893c077; border-radius: 9px; padding: 7px 10px; cursor: pointer; font: inherit; }
+.must-light-entry { display: flex; gap: 9px; margin: 0 0 12px; }
+.must-light-panel .must-light-primary, .must-light-entry { color: #fff; background: #2859cc; border-color: #2859cc; }
+.must-light-panel button:disabled { opacity: .45; cursor: default; }
+.must-light-clues { display: grid; gap: 6px; }
+.must-light-clue, .must-light-rule-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.must-light-panel iframe { width: 100%; height: 365px; border: 0; border-radius: 11px; background: #101e39; }
+.must-light-history { margin: 0; display: grid; gap: 8px; padding-inline-start: 20px; }
+.must-light-history small { display: block; margin-top: 2px; }
+.must-light-history button[aria-pressed=true] { border-color: #457de7; }
+.must-light-error { color: #cc4157; }
+@media(max-width: 1030px) { .must-light-grid { grid-template-columns: 1fr; } }

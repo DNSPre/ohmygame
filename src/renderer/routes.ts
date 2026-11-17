@@ -10,6 +10,7 @@ export type SidebarPage =
   | "web-game"
   | "interactive-story"
   | "godot"
+  | "light-game"
   | "image-generation"
   | "video-generation"
   | "asset-canvas"
@@ -28,7 +29,7 @@ type SidebarRoutePage = Exclude<SidebarPage, "community" | "projects" | "plugins
 export const DEFAULT_SETTINGS_SECTION: SettingsSection = "providers";
 
 const SIDEBAR_PAGES = new Set<SidebarRoutePage>([
-  "home", "library", "general", "web-game", "interactive-story", "godot", "asset-canvas", "image-generation", "video-generation",
+  "home", "library", "general", "web-game", "interactive-story", "godot", "asset-canvas", "light-game", "image-generation", "video-generation",
 ]);
 
 export type AppRoute =

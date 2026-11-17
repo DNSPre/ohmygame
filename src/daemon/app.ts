@@ -52,6 +52,7 @@ import { createGameUseTool } from "./playtest-tools.js";
 import { ExternalMcpService } from "./external-mcp.js";
 import { ExternalAgentClients } from "./external-agent-clients.js";
 import { runCli } from "./agent-runtimes/discovery.js";
+import { DEMO, parseModelGame, validateLightGame } from "../shared/light-game.js";
 import { generateCreativeText, generateDesignDocumentMarkdown, generateDesignTable, generateProjectName } from "./text-generation.js";
 import { ProjectNaming, type ProjectNameGenerator } from "./project-naming.js";
 import { resolveCanvasTextReferences } from "./canvas-text-references.js";
@@ -1657,6 +1658,43 @@ export function createApp(options: AppOptions = {}) {
       return reply.code(500).send({ error: "The Node was created, but project metadata could not be updated" });
     }
     return result;
+  });
+
+  app.post<{ Body: { brief: string; previous?: unknown } }>("/light-game/specification", {
+    bodyLimit: 16_000,
+    schema: { body: { type: "object", additionalProperties: false, required: ["brief"], properties: {
+      brief: { type: "string", minLength: 1, maxLength: 4_000 },
+      previous: { type: "object" },
+    } } },
+  }, async (request, reply) => {
+    let previous;
+    try {
+      previous = request.body.previous === undefined ? undefined : validateLightGame(request.body.previous).spec;
+    } catch {
+      return reply.code(400).send({ error: "The prior specification is invalid." });
+    }
+    const settings = SettingsManager.create(dataDirectory, piAgentDirectory);
+    const provider = settings.getDefaultProvider();
+    const id = settings.getDefaultModel();
+    if (!provider || !id || !providerEnabled(provider)) return reply.code(409).send({ error: "Configure a default language model in Settings → Providers & Models." });
+    try {
+      const runtime = await getModelRuntime();
+      const model = resolveModel(runtime, runtime.getModel(provider, id));
+      if (!model || !runtime.hasConfiguredAuth(provider)) return reply.code(409).send({ error: "The default language model is not available." });
+      const instruction = [
+        "Return only a JSON specification for a fixed browser clue-collection game. Do not write code, links, HTML or external asset references.",
+        "Use precisely the keys and types in the example. Title <=48, objective <=240, ending <=160, and unique clue labels <=40 characters. Use 2–8 clues. Each after is null or the zero-based index of a prior prerequisite; no self references or cycles.",
+        "Set threshold to 1–clue count and moves to 2–12. Allow at least threshold + 1 moves so the player can collect and exit. Use the language of the brief.",
+        "For a revision, change only explicitly requested rule fields; preserve all others.",
+        "Example: " + JSON.stringify(DEMO),
+        "Input: " + JSON.stringify({ brief: request.body.brief, previous }),
+      ].join("\n");
+      const text = await generateCreativeText(runtime, model, instruction, effectiveReasoningLevel(model, undefined, defaultReasoningLevel(dataDirectory, piAgentDirectory)), []);
+      if (!text) return reply.code(502).send({ error: "The model returned no specification." });
+      return { spec: parseModelGame(text), model: { provider, id } };
+    } catch (cause) {
+      return reply.code(502).send({ error: cause instanceof Error ? cause.message : String(cause) });
+    }
   });
 
   const textGenerationOptions = {

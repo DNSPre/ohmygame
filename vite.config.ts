@@ -1,4 +1,5 @@
 /// <reference types="vitest/config" />
+import { gameShell } from "./src/shared/light-game-template.js";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
@@ -22,6 +23,7 @@ export default defineConfig({
   },
   plugins: [
     playableSandboxDevPlugin(),
+    lightGamePlayerPlugin(),
     react(),
     sentryAuthToken
       ? sentryVitePlugin({
@@ -127,6 +129,41 @@ function playableSandboxDevPlugin(): Plugin {
           response.setHeader("Content-Type", "text/plain; charset=utf-8");
           response.end("Playable sandbox could not be built.");
         }
+      });
+    },
+  };
+}
+
+function lightGamePlayerPlugin(): Plugin {
+  const virtualSource = "virtual:must-light-game-runtime";
+  const virtualId = "\0" + virtualSource;
+  const page = "light-game-player.html";
+  const script = "assets/light-game-player.js";
+  const html = gameShell("zh", '<script src="./' + script + '"></script>', true);
+  async function bundle(): Promise<string> {
+    const result = await buildWithEsbuild({
+      entryPoints: [path.resolve(import.meta.dirname, "src/renderer/light-game-player.ts")],
+      format: "iife", bundle: true, target: "es2022", platform: "browser", write: false,
+    });
+    return result.outputFiles[0]!.text;
+  }
+  return {
+    name: "must-light-game-player",
+    resolveId(id) { if (id === virtualSource) return virtualId; },
+    async load(id) { if (id === virtualId) return "export default " + JSON.stringify(await bundle()); },
+    async generateBundle() {
+      this.emitFile({ type: "asset", fileName: page, source: html });
+      this.emitFile({ type: "asset", fileName: script, source: await bundle() });
+    },
+    configureServer(server) {
+      server.middlewares.use(async (request, response, next) => {
+        const pathname = new URL(request.url ?? "/", "http://localhost").pathname;
+        if (pathname !== "/" + page && pathname !== "/" + script) return next();
+        const isPage = pathname.endsWith(".html");
+        try {
+          response.setHeader("Content-Type", isPage ? "text/html; charset=utf-8" : "text/javascript; charset=utf-8");
+          response.end(isPage ? html : await bundle());
+        } catch (error) { next(error); }
       });
     },
   };
