@@ -91,7 +91,6 @@ export function Home({ onNavigate, onCreate, onOpen, inert = false }: HomeProps)
         <WindowDragRegion />
         <div className="home-start">
           <JointStudioHero />
-          <button className="must-light-entry" type="button" onClick={() => onNavigate("light-game")}>{t("lightGame.nav")} <span aria-hidden="true">→</span></button>
           <ProjectPromptCreator
             preset={preset}
             projectType={projectType}
@@ -101,7 +100,7 @@ export function Home({ onNavigate, onCreate, onOpen, inert = false }: HomeProps)
             onOpenProject={onOpen}
             onCreate={onCreate}
           />
-          <JointStudioActions onPrototype={() => onNavigate("light-game")} onGames={() => onNavigate("web-game")} onPreset={(text) => {
+          <JointStudioActions onGames={() => onNavigate("web-game")} onPreset={(text) => {
             setProjectType("web-game");
             setPreset({ text });
           }} />
