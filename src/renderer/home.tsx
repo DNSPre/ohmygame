@@ -17,7 +17,7 @@ import { useProjectShelfLayout } from "./use-project-shelf-layout.js";
 import { useProjectActivity } from "./use-project-activity.js";
 import "./studios.css";
 import { JointStudioHero, JointStudioActions } from "./joint-studio.js";
-import { PagesPrompt, PagesNotice } from "./pages-prompt.js";
+import { PagesPrompt } from "./pages-prompt.js";
 import { t } from "./i18n.js";
 
 interface HomeProps {
@@ -102,11 +102,11 @@ export function Home({ onNavigate, onCreate, onOpen, inert = false, pagesPreview
             onOpenProject={onOpen}
             onCreate={onCreate}
           />}
-          <JointStudioActions onGames={() => onNavigate("web-game")} onPreset={(text) => {
+          <JointStudioActions showReference={!pagesPreview} onGames={() => onNavigate("web-game")} onPreset={(text) => {
             setProjectType("web-game");
             setPreset({ text });
           }} />
-          {pagesPreview ? <PagesNotice /> : <button className="home-start-blank" type="button" onClick={() => setCreateOpen(true)}>
+          {!pagesPreview && <button className="home-start-blank" type="button" onClick={() => setCreateOpen(true)}>
             <Plus size={14} />{t("home.startBlank")}
           </button>}
         </div>
