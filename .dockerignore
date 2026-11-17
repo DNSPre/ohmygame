@@ -1,0 +1,13 @@
+.git
+.data
+.env
+.env.*
+.runtime
+node_modules
+dist
+coverage
+release
+*.log
+**/.env
+**/.env.*
+**/.data

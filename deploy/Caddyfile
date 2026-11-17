@@ -1,0 +1,27 @@
+{$STUDIO_SITE} {
+	root * /srv/studio
+	encode zstd gzip
+	header {
+		X-Content-Type-Options nosniff
+		X-Frame-Options SAMEORIGIN
+		Referrer-Policy no-referrer
+	}
+	route {
+		basic_auth {
+			{$STUDIO_USER} {$STUDIO_PASSWORD_HASH}
+		}
+		handle_path /api/* {
+			@foreign {
+				header Origin *
+				not header Origin {$STUDIO_ORIGIN}
+			}
+			respond @foreign 403
+			reverse_proxy studio:43210 {
+				header_up Authorization "Bearer {$STUDIO_DAEMON_TOKEN}"
+			}
+		}
+		handle {
+			file_server
+		}
+	}
+}
