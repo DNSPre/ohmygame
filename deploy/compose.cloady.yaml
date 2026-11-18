@@ -32,6 +32,7 @@ services:
     environment:
       STUDIO_SITE: http://:80
       STUDIO_ORIGIN: ${CLOADY_PRIMARY_URL:-https://studio.example.invalid}
+      STUDIO_CUSTOM_ORIGIN: https://game.design.cab
       STUDIO_DAEMON_TOKEN: ${STUDIO_DAEMON_TOKEN:?Set STUDIO_DAEMON_TOKEN}
       STUDIO_USER: ${STUDIO_USER:-studio}
       STUDIO_PASSWORD_HASH: ${STUDIO_PASSWORD_HASH:?Set STUDIO_PASSWORD_HASH}

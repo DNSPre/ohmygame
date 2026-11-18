@@ -13,7 +13,10 @@
 		handle_path /api/* {
 			@foreign {
 				header Origin *
-				not header Origin {$STUDIO_ORIGIN}
+				not {
+					header Origin {$STUDIO_ORIGIN}
+					header Origin {$STUDIO_CUSTOM_ORIGIN:https://studio.example.invalid}
+				}
 			}
 			respond @foreign 403
 			reverse_proxy studio:43210 {
