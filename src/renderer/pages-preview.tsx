@@ -6,6 +6,10 @@ import { parseAppRoute, projectHash, settingsHash, sidebarHash, DEFAULT_SETTINGS
 const studioPath = "/studio/";
 
 function navigate(target: AppNavigationTarget) {
+  if (target === "web-game") {
+    location.assign("/play/");
+    return;
+  }
   const hash = target === "settings" ? settingsHash(DEFAULT_SETTINGS_SECTION) : sidebarHash(target);
   location.assign(studioPath + hash);
 }
@@ -13,7 +17,10 @@ function navigate(target: AppNavigationTarget) {
 export function PagesPreview() {
   useEffect(() => {
     function openExistingLink() {
-      if (parseAppRoute(location.hash).page !== "home") {
+      const page = parseAppRoute(location.hash).page;
+      if (page === "web-game") {
+        location.replace("/play/");
+      } else if (page !== "home") {
         location.replace(studioPath + location.hash);
       }
     }

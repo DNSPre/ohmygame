@@ -106,7 +106,7 @@ export function Home({ onNavigate, onCreate, onOpen, inert = false, pagesPreview
             setProjectType("web-game");
             setPreset({ text });
           }} />
-          {!pagesPreview && <button className="home-start-blank" type="button" onClick={() => setCreateOpen(true)}>
+          {pagesPreview ? <a className="home-start-blank" href="/play/">免登入 AI 遊戲創作</a> : <button className="home-start-blank" type="button" onClick={() => setCreateOpen(true)}>
             <Plus size={14} />{t("home.startBlank")}
           </button>}
         </div>
