@@ -18,6 +18,7 @@ interface ModelSelectorProps {
   reasoningLevel?: AgentReasoningLevel;
   nativeReasoningLevel?: string;
   disabled?: boolean;
+  allowEmptyMenu?: boolean;
   variant?: "chat" | "canvas";
   placement?: "above" | "below";
   onChange: (model: AgentModel, reasoningLevel: AgentReasoningLevel) => void;
@@ -27,7 +28,7 @@ interface ModelSelectorProps {
 
 type ModelPanel = "models" | "reasoning";
 
-export function ModelSelector({ models, status = "ready", value, reasoningLevel, nativeReasoningLevel, disabled, variant = "chat", placement = "above", onChange, onReasoningChange, onNativeReasoningChange }: ModelSelectorProps) {
+export function ModelSelector({ models, status = "ready", value, reasoningLevel, nativeReasoningLevel, disabled, allowEmptyMenu = false, variant = "chat", placement = "above", onChange, onReasoningChange, onNativeReasoningChange }: ModelSelectorProps) {
   const [panel, setPanel] = useState<ModelPanel>();
   const [position, setPosition] = useState<{ top: number; left: number }>();
   const [query, setQuery] = useState("");
@@ -140,7 +141,7 @@ export function ModelSelector({ models, status = "ready", value, reasoningLevel,
         aria-controls={menuId}
         aria-expanded={open}
         aria-haspopup="menu"
-        disabled={disabled || (!canvas && !canSelect)}
+        disabled={disabled || (!canvas && !canSelect && !allowEmptyMenu)}
         onClick={toggle}
         title={current ? `${t("modelSelector.textModelTitle", { provider: current.providerName, name: current.name })}${supportsReasoning ? ` · ${reasoningText}` : ""}` : unavailableLabel}
       >

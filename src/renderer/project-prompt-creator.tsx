@@ -320,6 +320,7 @@ export function ProjectPromptCreator({ preset, projectType, projectTypes = PROJE
           <>
             <ModelSelector
               placement="below"
+              allowEmptyMenu
               models={modelCatalog.models}
               status={modelCatalog.status}
               value={selectedModel}
