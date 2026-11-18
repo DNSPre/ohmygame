@@ -32,3 +32,11 @@ SSH 金鑰或本機專案資料。
 部署配置只發布 gateway 的 80 埠，由 Cloady 提供 HTTPS；後端的 43210 埠供內部使用。
 `studio-data` 掛載到 `/data`。直接使用 Cloady 提供的 HTTPS 網址聯調，公開演示繼續使用 GitHub Pages。
 部署後先確認未登入的請求收到 401，再在登入後檢查專案持久化及 AI 生成的串流回應。
+
+## 使用 Cloudflare 按路徑分流
+
+在 Cloudflare 啟用 `design.cab` 並保留 `game` 的 GitHub Pages CNAME 目標
+`dnspre.github.io`，將此記錄設為代理並使用 Full (strict) TLS。
+從 `deploy/cloudflare` 執行 `npx wrangler deploy`。
+首頁和演示資源由 GitHub Pages 提供；`/studio/` 與 `/api/` 由 Worker 轉發到
+有登入驗證的 Cloady 工作台。GitHub Pages 的自訂網域保持為 `game.design.cab`。
