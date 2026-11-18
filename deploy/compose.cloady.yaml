@@ -8,6 +8,11 @@ services:
       OHMYGAME_DAEMON_TOKEN: ${STUDIO_DAEMON_TOKEN:?Set STUDIO_DAEMON_TOKEN}
     expose:
       - "43210"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.40"
+          memory: 896M
     volumes:
       - studio-data:/data
     healthcheck:
@@ -33,6 +38,11 @@ services:
       STUDIO_PASSWORD_HASH: ${STUDIO_PASSWORD_HASH:?Set STUDIO_PASSWORD_HASH}
     ports:
       - "80:80"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.10"
+          memory: 128M
 
 volumes:
   studio-data:
