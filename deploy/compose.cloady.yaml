@@ -1,0 +1,38 @@
+services:
+  studio:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      target: studio
+    environment:
+      OHMYGAME_DAEMON_TOKEN: ${STUDIO_DAEMON_TOKEN:?Set STUDIO_DAEMON_TOKEN}
+    expose:
+      - "43210"
+    volumes:
+      - studio-data:/data
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:43210/health',{headers:{Authorization:'Bearer '+process.env.OHMYGAME_DAEMON_TOKEN}}).then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 45s
+
+  gateway:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      target: gateway
+    depends_on:
+      studio:
+        condition: service_healthy
+    environment:
+      STUDIO_SITE: http://:80
+      STUDIO_ORIGIN: ${CLOADY_PRIMARY_URL:-https://studio.example.invalid}
+      STUDIO_DAEMON_TOKEN: ${STUDIO_DAEMON_TOKEN:?Set STUDIO_DAEMON_TOKEN}
+      STUDIO_USER: ${STUDIO_USER:-studio}
+      STUDIO_PASSWORD_HASH: ${STUDIO_PASSWORD_HASH:?Set STUDIO_PASSWORD_HASH}
+    ports:
+      - "80:80"
+
+volumes:
+  studio-data:

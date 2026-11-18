@@ -20,3 +20,15 @@ SSH 金鑰或本機專案資料。
 目前網頁遊戲的即時預覽會使用主機端的 loopback URL，遠端瀏覽器不能直接使用。
 因此這份配置不把生成中的遊戲伺服器或代碼暴露在公共網域；可以在工作台匯出專案，
 再在本機試玩。若需雲端實時試玩，需另配置與工作台不同來源的預覽服務。
+
+## Cloady 聯調環境
+
+從 GitHub 匯入 `DNSPre/ohmygame` 的 `codex/must-game-design-studio` 分支。
+在首次部署的環境變數中設定 `CLOADY_COMPOSEFILE_PATH=deploy/compose.cloady.yaml`，
+並將上方步驟生成的 `STUDIO_DAEMON_TOKEN` 和 `STUDIO_PASSWORD_HASH` 設為密鑰。
+填入原始雜湊值，並在部署前核對平台預覽的環境設定與費用。
+預設登入帳號為 `studio`，可用 `STUDIO_USER` 覆寫。
+
+部署配置只發布 gateway 的 80 埠，由 Cloady 提供 HTTPS；後端的 43210 埠供內部使用。
+`studio-data` 掛載到 `/data`。直接使用 Cloady 提供的 HTTPS 網址聯調，公開演示繼續使用 GitHub Pages。
+部署後先確認未登入的請求收到 401，再在登入後檢查專案持久化及 AI 生成的串流回應。
