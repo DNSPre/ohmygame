@@ -102,7 +102,7 @@ export function Home({ onNavigate, onCreate, onOpen, inert = false, pagesPreview
             onOpenProject={onOpen}
             onCreate={onCreate}
           />}
-          <JointStudioActions showReference={!pagesPreview} onGames={() => onNavigate("web-game")} onPreset={(text) => {
+          <JointStudioActions onGames={() => onNavigate("web-game")} onPreset={(text) => {
             setProjectType("web-game");
             setPreset({ text });
           }} />

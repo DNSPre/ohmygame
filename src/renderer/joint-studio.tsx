@@ -16,8 +16,7 @@ export function JointStudioHero() {
   </header>;
 }
 
-export function JointStudioActions({ onGames, onPreset, showReference }: {
-  showReference: boolean;
+export function JointStudioActions({ onGames, onPreset }: {
   onGames: () => void;
   onPreset: (text: string) => void;
 }) {
@@ -25,6 +24,5 @@ export function JointStudioActions({ onGames, onPreset, showReference }: {
     <button type="button" onClick={() => onPreset(expert)}><Sparkles size={15} />{t("jointStudio.expert")}</button>
     <button type="button" onClick={() => onPreset(example)}><WandSparkles size={15} />{t("jointStudio.generate")}</button>
     <button type="button" onClick={onGames}><Gamepad2 size={15} />{t("jointStudio.games")}</button>
-    {showReference && <a href="https://66.99.com/" target="_blank" rel="noopener noreferrer">{t("jointStudio.visit")}</a>}
   </div>;
 }

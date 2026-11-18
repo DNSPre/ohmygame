@@ -75,7 +75,7 @@ export function SettingsPage({ section, onBack, onSectionChange, onOpenOnboardin
         </button>
         <nav className="settings-page-nav" aria-label={t("settings.nav.label")} ref={navigation}>
           <div className="home-nav-label">{t("settings.nav.heading")}</div>
-          {SETTINGS_SECTIONS.map((item) => {
+          {SETTINGS_SECTIONS.filter((item) => item.section !== "about" || window.ohMyGameDesktop).map((item) => {
             const Icon = item.icon;
             const active = section === item.section;
             return (
@@ -98,7 +98,7 @@ export function SettingsPage({ section, onBack, onSectionChange, onOpenOnboardin
           {section === "web-search" ? <WebSearchSettingsPanel /> : null}
           {section === "network" ? <NetworkSettingsPanel /> : null}
           {section === "mcp-server" ? <ExternalAgentsSettings /> : null}
-          {section === "about" ? <AboutSettings onOpenNetwork={() => chooseSection("network")} onOpenOnboarding={onOpenOnboarding} /> : null}
+          {section === "about" && window.ohMyGameDesktop ? <AboutSettings onOpenNetwork={() => chooseSection("network")} onOpenOnboarding={onOpenOnboarding} /> : null}
         </div>
       </section>
     </main>

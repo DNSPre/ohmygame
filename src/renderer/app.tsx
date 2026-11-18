@@ -41,6 +41,11 @@ export function App() {
   const [initialCanvasNode, setInitialCanvasNode] = useState<{ projectId: string; nodeId: string }>();
   const [playtestEditorProjectId, setPlaytestEditorProjectId] = useState<string>();
   const creationGate = usePluginIntegrationGate();
+  const redirectAbout = route.page === "settings" && route.section === "about" && !window.ohMyGameDesktop;
+
+  useEffect(() => {
+    if (redirectAbout) navigate(settingsHash(DEFAULT_SETTINGS_SECTION), { replace: true });
+  }, [navigate, redirectAbout]);
 
   // Provider catalogs are slow; load them now so asset canvas quick starts open without waiting.
   useEffect(() => {
@@ -67,7 +72,7 @@ export function App() {
   if (route.page === "home" && !onboarding.state) return <OnboardingLoading error={onboarding.error} onRetry={onboarding.retry} />;
   if (route.page === "plugin-builder") return <Suspense fallback={<RouteLoading />}><PluginBuilder key={route.sessionId} sessionId={route.sessionId} /></Suspense>;
   if (route.page === "settings") {
-    return <Suspense fallback={<RouteLoading />}><SettingsPage section={route.section} onBack={leaveSettings} onSectionChange={navigateToSettingsSection} onOpenOnboarding={onboarding.open} /></Suspense>;
+    return <Suspense fallback={<RouteLoading />}><SettingsPage section={redirectAbout ? DEFAULT_SETTINGS_SECTION : route.section} onBack={leaveSettings} onSectionChange={navigateToSettingsSection} onOpenOnboarding={onboarding.open} /></Suspense>;
   }
   if (route.page === "plugins") return <>{creationGate.dialog}<SidebarPageLayout active="plugins" onNavigate={navigateToSidebarPage}>
     <Suspense fallback={null}><PluginsSettings pluginId={route.pluginId} onPluginChange={navigateToPlugin} onTryPlugin={tryPlugin} /></Suspense>
