@@ -114,7 +114,9 @@ export function Home({ onNavigate, onCreate, onOpen, inert = false, pagesPreview
         <section ref={sectionRef} className="home-recent studio-projects" aria-labelledby="projects-heading">
           <div className="studio-section-heading">
             <h2 id="projects-heading">{t("projects.recent")}</h2>
-            {phase === "error" ? (
+            {pagesPreview ? (
+              <a className="studio-text-link" href="/studio/">{t("pagesPreview.fullSource")}</a>
+            ) : phase === "error" ? (
               <button className="studio-text-link" type="button" onClick={() => void loadProjects()}>
                 <RefreshCw size={14} />{t("common.retry")}
               </button>
