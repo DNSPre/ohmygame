@@ -2,8 +2,7 @@ services:
   studio:
     build:
       context: ..
-      dockerfile: deploy/Dockerfile
-      target: studio
+      dockerfile: deploy/Dockerfile.cloady-studio
     environment:
       OHMYGAME_DAEMON_TOKEN: ${STUDIO_DAEMON_TOKEN:?Set STUDIO_DAEMON_TOKEN}
     expose:
