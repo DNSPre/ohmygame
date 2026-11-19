@@ -147,7 +147,7 @@ export function AppSidebar({ active, onNavigate, pagesPreview = false }: AppSide
           <NavigationItem active={active === "projects"} icon="project" label={t("jointStudio.projectLibrary")} onClick={() => onNavigate("projects")} />
         </div>
       </nav>
-      {pagesPreview ? <div className="home-sidebar-account"><span className="home-sidebar-account-name">{t("pagesPreview.badge")}</span></div> : auth.state.status === "signed-in" ? (
+      {pagesPreview ? <div className="home-sidebar-account"><button type="button" onClick={() => onNavigate("settings")}>{t("guestStudio.settings")}</button></div> : auth.state.status === "signed-in" ? (
         <div className="home-sidebar-account" ref={account}>
           <button className="home-sidebar-account-main" type="button" aria-label={t("sidebar.openAccountMenu")} aria-expanded={accountMenuOpen} onClick={() => {
             setAccountMenuOpen((open) => !open);

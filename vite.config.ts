@@ -21,6 +21,13 @@ export default defineConfig({
     __APP_CHANGELOG__: JSON.stringify(parseChangelog(readFileSync(new URL("./CHANGELOG.md", import.meta.url), "utf8"))),
   },
   plugins: [
+    {
+      name: "guest-model-connections",
+      transformIndexHtml(html) {
+        if (process.env.VITE_MUST_PAGES !== "1") return html;
+        return html.replace(/connect-src [^;]+;/, "connect-src 'self' blob: https: http://127.0.0.1:* http://localhost:*;");
+      },
+    },
     playableSandboxDevPlugin(),
     react(),
     sentryAuthToken

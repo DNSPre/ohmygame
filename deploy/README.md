@@ -40,3 +40,11 @@ SSH 金鑰或本機專案資料。
 從 `deploy/cloudflare` 執行 `npx wrangler deploy`。
 首頁和演示資源由 GitHub Pages 提供；`/studio/` 與 `/api/` 由 Worker 轉發到
 有登入驗證的 Cloady 工作台。GitHub Pages 的自訂網域保持為 `game.design.cab`。
+
+## 公開個人工作區
+
+公開首頁使用 VITE_MUST_PAGES=1 建置，訪客的作品儲存在自己的瀏覽器 IndexedDB，模型設定儲存在 localStorage，API Key 僅保留於頁面記憶體。瀏覽器直接連接訪客指定的 Ollama 或 OpenAI 相容 API，服務必須允許本站的 CORS 來源。不同裝置或瀏覽器的資料不會同步，作品可以匯出再匯入。
+
+HTML 遊戲在不具同源權限、禁止網路請求的 sandbox iframe 中試玩。瀏覽器版支援獨立 HTML 遊戲和互動故事，不執行 Godot 或任意伺服器指令。圖片和影片需要相容的 images/generations 或 videos API。
+
+Cloady 的一般頁面會轉到公開首頁。原有管理工作台可於 Cloady 網址的 /admin/ 存取，仍需要原有帳密。/api/ 保留驗證，公開個人工作區不使用它。既有 /studio/ 書籤也會經此轉址進入公開首頁。

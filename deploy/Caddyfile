@@ -7,8 +7,17 @@
 		Referrer-Policy no-referrer
 	}
 	route {
+		@publicWorkspace {
+			not path /api /api/* /admin /admin/*
+		}
+		redir @publicWorkspace https://game.design.cab{uri} 302
+
 		basic_auth {
 			{$STUDIO_USER} {$STUDIO_PASSWORD_HASH}
+		}
+		redir /admin /admin/ 308
+		handle_path /admin/* {
+			file_server
 		}
 		handle_path /api/* {
 			@foreign {
