@@ -23,6 +23,10 @@ export default defineConfig({
   plugins: [
     {
       name: "guest-model-connections",
+      async buildStart() {
+        if (process.env.VITE_MUST_PAGES !== "1") return;
+        await buildWithEsbuild({ entryPoints: ["src/daemon/guest-agent-bridge.ts"], bundle: true, platform: "node", target: "node22", format: "esm", outfile: "public/must-agent-bridge.mjs", banner: { js: 'import { createRequire as __createGuestRequire } from "node:module"; const require = __createGuestRequire(import.meta.url);' } });
+      },
       transformIndexHtml(html) {
         if (process.env.VITE_MUST_PAGES !== "1") return html;
         return html.replace(/connect-src [^;]+;/, "connect-src 'self' blob: https: http://127.0.0.1:* http://localhost:*;");

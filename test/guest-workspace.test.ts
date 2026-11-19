@@ -46,3 +46,24 @@ describe("personal workspace boundaries", () => {
     expect(() => extractGame("Here are some ideas")).toThrow();
   });
 });
+
+describe("native agent settings", () => {
+  it("retains native model selection without retaining a pairing credential", async () => {
+    const { readBridgePairing } = await import("../src/renderer/guest/models.js");
+    const token = "a".repeat(64);
+    const pairing = readBridgePairing("#/settings/providers?bridge=" + token + "&agent=claude-code");
+    expect(pairing).toEqual({ token, agent: "claude-code" });
+    persistSettings({ ...settings, protocol: "claude-code", baseUrl: "http://127.0.0.1:11435", availableModels: ["sonnet", "opus"] });
+    expect(readSettings()).toMatchObject({ protocol: "claude-code", availableModels: ["sonnet", "opus"] });
+    expect(localStorage.getItem("must:personal-model-settings")).not.toContain(token);
+    expect(readBridgePairing("#/settings/providers?bridge=untrusted&agent=codex")).toBeUndefined();
+  });
+  it("uses the connector for native generation, without calling a cloud chat API", async () => {
+    const fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify({content:"<html>native game</html>"})));
+    vi.stubGlobal("fetch", fetch);
+    const result = await generateText({ ...settings, protocol: "codex", baseUrl:"http://127.0.0.1:11435" }, "local-pairing-token", [{role:"user",content:"test"}], new AbortController().signal);
+    expect(result).toBe("<html>native game</html>");
+    expect(fetch.mock.calls[0]?.[0]).toBe("http://127.0.0.1:11435/agents/generate");
+    expect(JSON.parse(fetch.mock.calls[0]?.[1].body)).toMatchObject({agent:"codex",model:"test-model"});
+  });
+});

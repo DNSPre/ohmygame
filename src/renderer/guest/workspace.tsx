@@ -5,7 +5,7 @@ import { JointStudioHero } from "../joint-studio.js";
 import { t } from "../i18n.js";
 import { downloadAssetBlob } from "../library-assets.js";
 import { parseAppRoute, sidebarHash, type AppNavigationTarget } from "../routes.js";
-import { extractGame, fetchModels, gameSystemPrompt, generateText, persistSettings, previewHtml, readSettings, type GuestSettings } from "./models.js";
+import { extractGame, fetchModelCatalog, gameSystemPrompt, generateText, isNativeAgent, persistSettings, previewHtml, readBridgePairing, readSettings, type GuestSettings } from "./models.js";
 import { importProject, readProjects, saveProject, type GuestProject } from "./storage.js";
 import { generateImage, generateVideo } from "./media.js";
 import { sampleGame } from "./sample.js";
@@ -21,10 +21,11 @@ function errorMessage(error: unknown): string {
 }
 
 export function GuestWorkspace() {
-  const [route, setRoute] = useState(() => parseAppRoute(location.hash));
-  const [settings, setSettings] = useState(readSettings);
+  const [pairing] = useState(() => readBridgePairing(location.hash));
+  const [route, setRoute] = useState(() => parseAppRoute(pairing ? "#/settings/providers" : location.hash));
+  const [settings, setSettings] = useState<GuestSettings>(() => pairing ? { ...readSettings(), protocol: pairing.agent, baseUrl: "http://127.0.0.1:11435", model: "", availableModels: [] } : readSettings());
   // Each tab holds its own credential. Never persist it or include it in a project export.
-  const [apiKey, setApiKey] = useState("");
+  const [apiKey, setApiKey] = useState(pairing?.token ?? "");
   const [projects, setProjects] = useState<GuestProject[]>([]);
   const [current, setCurrent] = useState<GuestProject>();
   const [prompt, setPrompt] = useState("");
@@ -36,6 +37,7 @@ export function GuestWorkspace() {
   const assetInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    if (pairing) history.replaceState(null, "", location.pathname + location.search + "#/settings/providers");
     const read = () => { setRoute(parseAppRoute(location.hash)); setStatus(""); };
     window.addEventListener("hashchange", read);
     void readProjects().then(setProjects).catch(error => setStatus(errorMessage(error)));
@@ -116,7 +118,7 @@ export function GuestWorkspace() {
     <section className="home-content guest-content">
       <div className="guest-topbar"><span>{t("guestStudio.workspace")}</span><button type="button" onClick={() => navigate("settings")}>{t("guestStudio.settings")}</button></div>
       <p className="guest-privacy">{t("guestStudio.privacy")}</p>
-      {settingsPage ? <GuestModelSettings settings={settings} apiKey={apiKey} onSave={(next, key) => { setSettings(next); setApiKey(key); }} /> : <>
+      {settingsPage ? <GuestModelSettings settings={settings} apiKey={apiKey} autoConnect={Boolean(pairing)} onSave={(next, key) => { setSettings(next); setApiKey(key); }} /> : <>
         {listing ? <>
           <h1>{t(page === "projects" ? "guestStudio.projects" : page === "asset-canvas" ? "guestStudio.canvas" : "guestStudio.library")}</h1>
           <div className="guest-toolbar">
@@ -135,7 +137,15 @@ export function GuestWorkspace() {
             <label className="sr-only" htmlFor="guest-prompt">{t("guestStudio.idea")}</label>
             <textarea id="guest-prompt" value={prompt} disabled={busy} maxLength={8000} onChange={event => setPrompt(event.target.value)} placeholder={t(mediaMode ? "guestStudio.mediaPlaceholder" : "guestStudio.placeholder")} />
             <div className="guest-toolbar">
-              <button type="button" onClick={() => navigate("settings")}>{(mediaMode === "image" ? settings.imageModel : mediaMode === "video" ? settings.videoModel : settings.model) || t("guestStudio.configure")} ⚙</button>
+              <div className="guest-model-picker">
+                {!mediaMode && (settings.availableModels?.length ?? 0) > 0 ? <select aria-label={t("guestStudio.modelSelect")} value={settings.model} disabled={busy} onChange={event => {
+                  try { setSettings(persistSettings({ ...settings, model: event.target.value })); } catch (error) { setStatus(errorMessage(error)); }
+                }}>{[...new Set([settings.model, ...(settings.availableModels ?? [])])].filter(Boolean).map(model => <option key={model} value={model}>{model}</option>)}</select> : <span>{(mediaMode === "image" ? settings.imageModel : mediaMode === "video" ? settings.videoModel : settings.model) || t("guestStudio.configure")}</span>}
+                {!mediaMode && (settings.modelEfforts?.[settings.model]?.length ?? 0) > 0 && <select aria-label={t("guestStudio.reasoning")} value={settings.effort ?? ""} disabled={busy} onChange={event => {
+                  try { setSettings(persistSettings({ ...settings, effort: event.target.value })); } catch (error) { setStatus(errorMessage(error)); }
+                }}><option value="">{t("guestStudio.defaultEffort")}</option>{settings.modelEfforts?.[settings.model]?.map(effort => <option key={effort} value={effort}>{effort}</option>)}</select>}
+                <button type="button" aria-label={t("guestStudio.configure")} onClick={() => navigate("settings")}>⚙</button>
+              </div>
               {busy ? <button type="button" onClick={() => pending.current?.abort()}>{t("guestStudio.cancel")}</button> : <button className="guest-primary" type="submit" disabled={!prompt.trim()}>{t(mediaMode === "image" ? "guestStudio.image" : mediaMode === "video" ? "guestStudio.video" : planning ? "guestStudio.brief" : "guestStudio.generate")}</button>}
             </div>
           </form>
@@ -162,28 +172,74 @@ export function GuestWorkspace() {
   </main></PagesAuthProvider>;
 }
 
-function GuestModelSettings({ settings, apiKey, onSave }: { settings: GuestSettings; apiKey: string; onSave: (settings: GuestSettings, key: string) => void }) {
+const nativeAgents = [
+  { id: "codex", name: "Codex", login: "codex login", install: "https://developers.openai.com/codex/cli" },
+  { id: "claude-code", name: "Claude Code", login: "claude auth login", install: "https://code.claude.com/docs/en/overview" },
+  { id: "opencode", name: "OpenCode", login: "opencode auth login", install: "https://opencode.ai/docs/" },
+] as const;
+
+function GuestModelSettings({ settings, apiKey, autoConnect, onSave }: { settings: GuestSettings; apiKey: string; autoConnect: boolean; onSave: (settings: GuestSettings, key: string) => void }) {
   const [draft, setDraft] = useState(settings);
   const [draftKey, setDraftKey] = useState(apiKey);
-  const [models, setModels] = useState<string[]>([]);
+  const [models, setModels] = useState<string[]>(settings.availableModels ?? []);
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
+  const didConnect = useRef(false);
+  const native = isNativeAgent(draft.protocol);
+  const agent = nativeAgents.find(agent => agent.id === draft.protocol);
   const change = (field: keyof GuestSettings, value: string) => setDraft(current => ({ ...current, [field]: value }));
+
+  function chooseProtocol(protocol: GuestSettings["protocol"]) {
+    if (protocol === draft.protocol) return;
+    const sameBridge = isNativeAgent(protocol) && isNativeAgent(draft.protocol);
+    if (!sameBridge) setDraftKey("");
+    setModels([]); setStatus("");
+    setDraft(current => ({ ...current, protocol, model: "", availableModels: [], baseUrl: isNativeAgent(protocol) ? "http://127.0.0.1:11435" : protocol === "ollama" ? "http://127.0.0.1:11434" : "https://api.openai.com/v1" }));
+  }
+  async function loadModels() {
+    if (loading) return;
+    setLoading(true); setStatus("");
+    try {
+      const catalog = await fetchModelCatalog(draft, draftKey);
+      const result = catalog.models;
+      setModels(result);
+      setDraft(current => ({ ...current, availableModels: result, modelEfforts: catalog.efforts, model: result.includes(current.model) ? current.model : result[0] ?? current.model }));
+      setStatus(t(result.length ? "guestStudio.connected" : "guestStudio.noModels"));
+    } catch (error) { setStatus(errorMessage(error)); }
+    finally { setLoading(false); }
+  }
+  useEffect(() => {
+    if (autoConnect && !didConnect.current && native && draftKey) {
+      didConnect.current = true;
+      void loadModels();
+    }
+  }, [autoConnect]);
+
   return <section className="guest-settings"><h1>{t("guestStudio.settings")}</h1>
+    <h2>{t("guestStudio.agents")}</h2><p>{t("guestStudio.agentHint")}</p>
+    <div className="guest-agent-cards">{nativeAgents.map(item => <button key={item.id} type="button" aria-pressed={draft.protocol === item.id} onClick={() => chooseProtocol(item.id)}>{item.name}</button>)}</div>
     <form onSubmit={event => { event.preventDefault(); try { const clean = persistSettings(draft); onSave(clean, draftKey); setDraft(clean); setStatus(t("guestStudio.saved")); } catch (error) { setStatus(errorMessage(error)); } }}>
-      <label>{t("guestStudio.protocol")}<select value={draft.protocol} onChange={event => {
-        const protocol = event.target.value as GuestSettings["protocol"];
-        setDraftKey(""); setModels([]); setStatus(""); setDraft(current => ({ ...current, protocol, model: "", baseUrl: protocol === "ollama" ? "http://127.0.0.1:11434" : "https://api.openai.com/v1" }));
-      }}><option value="ollama">{t("guestStudio.local")}</option><option value="openai">{t("guestStudio.cloud")}</option></select></label>
-      <label>{t("guestStudio.baseUrl")}<input type="url" required value={draft.baseUrl} onChange={event => { setDraftKey(""); setModels([]); change("baseUrl", event.target.value); }} /></label>
-      <label>{t("guestStudio.key")}<input type="password" autoComplete="off" value={draftKey} onChange={event => setDraftKey(event.target.value)} /></label>
-      <div className="guest-toolbar"><button type="button" disabled={loading} onClick={async () => {
-        setLoading(true); setStatus(""); try { const result = await fetchModels(draft, draftKey); setModels(result); if (!draft.model && result[0]) change("model", result[0]); setStatus(t(result.length ? "guestStudio.connected" : "guestStudio.noModels")); } catch (error) { setStatus(errorMessage(error)); } finally { setLoading(false); }
-      }}>{t(loading ? "guestStudio.generating" : "guestStudio.loadModels")}</button></div>
+      <label>{t("guestStudio.protocol")}<select value={draft.protocol} onChange={event => chooseProtocol(event.target.value as GuestSettings["protocol"])}>
+        {nativeAgents.map(item => <option key={item.id} value={item.id}>{item.name}</option>)}
+        <option value="ollama">{t("guestStudio.local")}</option><option value="openai">{t("guestStudio.cloud")}</option>
+      </select></label>
+      {native && <div className="guest-agent-setup">
+        <a className="guest-download" href="/must-agent-bridge.mjs" download>{t("guestStudio.agentDownload")}</a>
+        <p>{t("guestStudio.agentSteps")}</p><pre>{navigator.userAgent.includes("Windows") ? 'node "$env:USERPROFILE\\Downloads\\must-agent-bridge.mjs"' : "node ~/Downloads/must-agent-bridge.mjs"}</pre>
+        <p>{t("guestStudio.agentLogin")}</p><pre>{agent?.login}</pre>
+        <a href={agent?.install} target="_blank" rel="noopener noreferrer">{t("guestStudio.agentInstall")} ↗</a>
+        <p>{t("guestStudio.agentPrivacy")}</p>
+      </div>}
+      <label>{t("guestStudio.baseUrl")}<input type="url" required value={draft.baseUrl} onChange={event => { setDraftKey(""); setModels([]); setDraft(current => ({ ...current, baseUrl: event.target.value, model: "", availableModels: [] })); }} /></label>
+      <label>{t(native ? "guestStudio.pairingCode" : "guestStudio.key")}<input type="password" autoComplete="off" value={draftKey} onChange={event => setDraftKey(event.target.value)} /></label>
+      <div className="guest-toolbar"><button type="button" disabled={loading} onClick={() => void loadModels()}>{t(loading ? "guestStudio.generating" : native ? "guestStudio.agentScan" : "guestStudio.loadModels")}</button></div>
+      {models.length > 0 && <label>{t("guestStudio.modelsAvailable")}<select value={models.includes(draft.model) ? draft.model : ""} onChange={event => change("model", event.target.value)}>
+        <option value="" disabled>{t("guestStudio.modelSelect")}</option>{models.map(model => <option key={model} value={model}>{model}</option>)}
+      </select></label>}
       <datalist id="guest-model-options">{models.map(model => <option key={model} value={model} />)}</datalist>
       <label>{t("guestStudio.textModel")}<input list="guest-model-options" value={draft.model} onChange={event => change("model", event.target.value)} /></label>
       {draft.protocol === "openai" && <><label>{t("guestStudio.imageModel")}<input value={draft.imageModel} onChange={event => change("imageModel", event.target.value)} /></label><label>{t("guestStudio.videoModel")}<input value={draft.videoModel} onChange={event => change("videoModel", event.target.value)} /></label></>}
-      <p>{t("guestStudio.modelHelp")}</p>
+      {!native && <p>{t("guestStudio.modelHelp")}</p>}
       <button type="submit" className="guest-primary">{t("guestStudio.save")}</button>
       {status && <p role="status">{status}</p>}
     </form>
