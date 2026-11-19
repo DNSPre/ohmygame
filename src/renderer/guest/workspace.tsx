@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { AppSidebar } from "../app-sidebar.js";
 import { PagesAuthProvider } from "../auth.js";
 import { JointStudioHero } from "../joint-studio.js";
+import muyuMark from "../assets/muyu-ai-icon.png";
 import { t } from "../i18n.js";
 import { downloadAssetBlob } from "../library-assets.js";
 import { parseAppRoute, sidebarHash, type AppNavigationTarget } from "../routes.js";
@@ -116,7 +117,7 @@ export function GuestWorkspace() {
   return <PagesAuthProvider><main className="home-shell must-studio-shell guest-workspace">
     <AppSidebar active={active} pagesPreview onNavigate={navigate} />
     <section className="home-content guest-content">
-      <div className="guest-topbar"><span>{t("guestStudio.workspace")}</span><button type="button" onClick={() => navigate("settings")}>{t("guestStudio.settings")}</button></div>
+      <div className="guest-topbar"><span className="guest-partner-brand"><img src={muyuMark} alt="" width={32} height={32} /><strong>目鱼AI</strong><span>{t("guestStudio.workspace")}</span></span><button type="button" onClick={() => navigate("settings")}>{t("guestStudio.settings")}</button></div>
       <p className="guest-privacy">{t("guestStudio.privacy")}</p>
       {settingsPage ? <GuestModelSettings settings={settings} apiKey={apiKey} autoConnect={Boolean(pairing)} onSave={(next, key) => { setSettings(next); setApiKey(key); }} /> : <>
         {listing ? <>
@@ -131,7 +132,7 @@ export function GuestWorkspace() {
             <strong>{project.name}</strong><span>{new Date(project.updatedAt).toLocaleString()}</span>
           </button>)}</div>
         </> : <>
-          {page === "home" ? <JointStudioHero /> : <header className="guest-heading"><h1>{t(mediaMode === "image" ? "mediaCreation.image" : mediaMode === "video" ? "mediaCreation.video" : planning ? "guestStudio.skills" : page === "community" ? "guestStudio.community" : page === "interactive-story" ? "guestStudio.story" : "jointStudio.games")}</h1>
+          {page === "home" ? <JointStudioHero partnerMark={muyuMark} /> : <header className="guest-heading">{mediaMode && <img className="guest-media-mark" src={muyuMark} alt="目鱼AI" width={80} height={80} />}<h1>{t(mediaMode === "image" ? "mediaCreation.image" : mediaMode === "video" ? "mediaCreation.video" : planning ? "guestStudio.skills" : page === "community" ? "guestStudio.community" : page === "interactive-story" ? "guestStudio.story" : "jointStudio.games")}</h1>
             <p>{t(mediaMode ? "guestStudio.mediaProtocol" : planning ? "guestStudio.skillsHint" : page === "community" ? "guestStudio.communityHint" : page === "godot" ? "guestStudio.godotHint" : "guestStudio.gameHint")}</p></header>}
           <form className="guest-composer" onSubmit={event => { event.preventDefault(); void generate(); }}>
             <label className="sr-only" htmlFor="guest-prompt">{t("guestStudio.idea")}</label>
